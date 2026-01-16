@@ -1,0 +1,10 @@
+# 這是給 YOLO 看的導航地圖
+path: /content/colab_model_Train_project/datasets/coco8  # 資料集根目錄
+train: images/train  # 訓練集圖片位置
+val: images/val      # 驗證集圖片位置
+
+# 類別名稱 (以 coco8 為例，這裡先列出前三個)
+names:
+  0: person
+  1: bicycle
+  2: car
