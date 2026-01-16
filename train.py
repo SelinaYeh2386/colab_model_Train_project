@@ -1,48 +1,59 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torchvision import datasets, transforms
+from torch.utils.data import DataLoader
 import os
 
-# 1. 模型定義
+# 1. 模型定義 (針對 28x28 的手寫數字圖片)
 class MyModel(nn.Module):
     def __init__(self):
         super(MyModel, self).__init__()
+        self.flatten = nn.Flatten()
         self.network = nn.Sequential(
-            nn.Linear(784, 128),
+            nn.Linear(28*28, 128),
             nn.ReLU(),
-            nn.Linear(128, 10)
+            nn.Linear(128, 10) # 輸出 0~9 共 10 類
         )
     def forward(self, x):
+        x = self.flatten(x)
         return self.network(x)
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    # 2. 準備現有的 MNIST 資料集
+    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
+    
+    # 下載到我們建立的 data 資料夾
+    train_data = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
+    train_loader = DataLoader(train_data, batch_size=64, shuffle=True)
+
     model = MyModel().to(device)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     criterion = nn.CrossEntropyLoss()
 
-    # 設定儲存路徑 (建議指向 Google Drive 掛載後的路徑，例如 /content/drive/MyDrive/models)
-    # 這裡先設在專案內的 models/
     checkpoint_dir = 'models'
     os.makedirs(checkpoint_dir, exist_ok=True)
     
-    print("--- 開始訓練 ---")
+    print(f"--- 開始訓練 (使用設備: {device}) ---")
     
-    # 模擬訓練 10 個 Epoch
-    for epoch in range(1, 11):
-        # --- 這裡原本會放訓練程式碼 (訓練過程略過) ---
+    for epoch in range(1, 6): # 跑 5 輪示範
+        model.train()
+        running_loss = 0.0
+        for batch_idx, (data, target) in enumerate(train_loader):
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+            output = model(data)
+            loss = criterion(output, target)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
         
-        # 2. 自動儲存邏輯
+        # 3. 自動儲存權重
         checkpoint_path = os.path.join(checkpoint_dir, f'model_epoch_{epoch}.pth')
-        
-        # 儲存內容：除了權重(state_dict)，通常還會存當前的 epoch 和 optimizer 狀態
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-        }, checkpoint_path)
-        
-        print(f"Epoch {epoch} 完成，權重已自動儲存至: {checkpoint_path}")
+        torch.save({'model_state_dict': model.state_dict()}, checkpoint_path)
+        print(f"Epoch {epoch} 完成! 平均 Loss: {running_loss/len(train_loader):.4f}, 存檔成功。")
 
 if __name__ == "__main__":
     main()
