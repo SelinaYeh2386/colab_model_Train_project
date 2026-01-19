@@ -1,5 +1,6 @@
 # 這是給 YOLO 看的導航地圖
-path: /content/colab_model_Train_project/datasets/coco8  # 資料集根目錄
+# 使用相對路徑，讓它在本機、Colab（/content/<repo>）或任何工作目錄下都更可攜
+path: datasets/coco8  # 資料集根目錄
 train: images/train  # 訓練集圖片位置
 val: images/val      # 驗證集圖片位置
 

@@ -5,11 +5,14 @@ def main():
     # 1. 載入預訓練模型 (YOLOv8 奈米版，速度最快)
     model = YOLO('yolov8n.pt') 
 
-    # 2. 開始訓練
-    # 我們直接使用官方的 'coco8.yaml'，它會自動下載圖片與標註檔
-    # coco8 包含 80 種常見物品（人、車、狗等）的標註
+    # 2. 選擇資料集設定
+    # - 若專案根目錄有 data.yaml，就用它（較適合在 Colab / 本機使用本 repo 的 datasets/）
+    # - 否則使用 ultralytics 內建的 coco8.yaml（會自動下載）
+    data_yaml = 'data.yaml' if os.path.exists('data.yaml') else 'coco8.yaml'
+
+    # 3. 開始訓練
     results = model.train(
-        data='coco8.yaml', 
+        data=data_yaml,
         epochs=5,          # 先跑 5 輪測試流程
         imgsz=640,         # 圖片縮放大小
         save=True,          # 自動儲存權重 (.pt 檔)
