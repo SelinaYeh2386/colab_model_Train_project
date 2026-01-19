@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual envs
+.venv/
+venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Ultralytics / training outputs
+# Note: we keep lightweight metadata (args.yaml, results.csv) but ignore big binaries.
+models/**/weights/*.pt
+models/**/weights/*.onnx
+models/**/weights/*.engine
+models/**/weights/*.torchscript
+models/**/weights/*.tflite
+models/**/weights/*.mlmodel
+models/**/events.out.tfevents*
+
+# Optional: if you use default Ultralytics runs/ folder, ignore it
+runs/

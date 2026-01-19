@@ -1,26 +1,84 @@
 from ultralytics import YOLO
+
+import argparse
+import datetime as _dt
 import os
 
-def main():
-    # 1. 載入預訓練模型 (YOLOv8 奈米版，速度最快)
-    model = YOLO('yolov8n.pt') 
 
-    # 2. 選擇資料集設定
-    # - 若專案根目錄有 data.yaml，就用它（較適合在 Colab / 本機使用本 repo 的 datasets/）
-    # - 否則使用 ultralytics 內建的 coco8.yaml（會自動下載）
-    data_yaml = 'data.yaml' if os.path.exists('data.yaml') else 'coco8.yaml'
+def _default_run_name(prefix: str = "my_exp") -> str:
+    ts = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"{prefix}_{ts}"
 
-    # 3. 開始訓練
-    results = model.train(
-        data=data_yaml,
-        epochs=5,          # 先跑 5 輪測試流程
-        imgsz=640,         # 圖片縮放大小
-        save=True,          # 自動儲存權重 (.pt 檔)
-        project='models',   # 儲存到我們建立的 models 資料夾
-        name='my_exp'       # 這次實驗的名字
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Train a YOLOv8 model using Ultralytics")
+    parser.add_argument(
+        "--data",
+        default="data.yaml",
+        help="Dataset YAML (default: data.yaml)",
     )
-    
-    print("--- 訓練完成！權重已儲存於 models/my_exp/weights/ ---")
+    parser.add_argument(
+        "--model",
+        default="yolov8n.pt",
+        help="Base model/weights to start from (default: yolov8n.pt)",
+    )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=5,
+        help="Number of epochs (default: 5)",
+    )
+    parser.add_argument(
+        "--imgsz",
+        type=int,
+        default=640,
+        help="Image size (default: 640)",
+    )
+    parser.add_argument(
+        "--project",
+        default="models",
+        help="Output project directory (default: models)",
+    )
+    parser.add_argument(
+        "--name",
+        default=None,
+        help="Run name under --project (default: auto timestamp)",
+    )
+    parser.add_argument(
+        "--device",
+        default=None,
+        help="Device for training, e.g. '0', 'cpu'. Default lets Ultralytics decide.",
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+
+    # Resolve data yaml fallback to ultralytics' coco8.yaml if user didn't provide one
+    data_yaml = args.data
+    if data_yaml == "data.yaml" and not os.path.exists("data.yaml"):
+        data_yaml = "coco8.yaml"
+
+    run_name = args.name or _default_run_name("my_exp")
+
+    model = YOLO(args.model)
+
+    train_kwargs = dict(
+        data=data_yaml,
+        epochs=args.epochs,
+        imgsz=args.imgsz,
+        save=True,
+        project=args.project,
+        name=run_name,
+    )
+    if args.device:
+        train_kwargs["device"] = args.device
+
+    model.train(**train_kwargs)
+
+    print(f"--- 訓練完成！權重已儲存於 {args.project}/{run_name}/weights/ ---")
+
 
 if __name__ == "__main__":
     main()
