@@ -29,7 +29,8 @@ amp: true
 fraction: 1.0
 profile: false
 freeze: null
-multi_scale: false
+multi_scale: 0.0
+compile: false
 overlap_mask: true
 mask_ratio: 4
 dropout: 0.0
@@ -81,6 +82,8 @@ cls: 0.5
 dfl: 1.5
 pose: 12.0
 kobj: 1.0
+rle: 1.0
+angle: 1.0
 nbs: 64
 hsv_h: 0.015
 hsv_s: 0.7
@@ -102,4 +105,4 @@ auto_augment: randaugment
 erasing: 0.4
 cfg: null
 tracker: botsort.yaml
-save_dir: runs\detect\yolov8-ui-custom
+save_dir: /content/runs/detect/yolov8-ui-custom
