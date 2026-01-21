@@ -1,3 +1,10 @@
+path: ./AddFrontPageTest_0905  # 資料集的根路徑
+
+train: train
+val: val
+
+nc: 34  # 你總共的類別數（例如 11 個：Chrome、BIOS、Terminal）
+
 names:
   0: INSYDE_SCU_GRAPHIC_ADVANCE_MENU
   1: INSYDE_SCU_GRAPHIC_BOOT_MENU
@@ -33,7 +40,6 @@ names:
   31: INSYDE_SCU_TEXTMODE_MENU_SET
   32: INSYDE_SCU_TEXTMODE_POWER_MENU
   33: INSYDE_SCU_TEXTMODE_SECURITY_MENU
-nc: 34
-path: /content
-train: train
-val: val
+  
+   
+  
